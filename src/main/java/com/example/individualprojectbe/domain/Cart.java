@@ -1,11 +1,13 @@
 package com.example.individualprojectbe.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 @Entity(name = "CARTS")
 public class Cart {
     @Id

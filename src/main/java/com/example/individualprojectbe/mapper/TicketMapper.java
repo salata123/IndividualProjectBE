@@ -13,7 +13,7 @@ public class TicketMapper {
                 ticketDto.getId(),
                 ticketDto.getCart(),
                 ticketDto.getStartAirport(),
-                ticketDto.getBetweenAirports(),
+                new AirportMapper().mapToAirportList(ticketDto.getBetweenAirports()),
                 ticketDto.getEndAirport(),
                 ticketDto.getDateOfFlight()
         );
@@ -24,7 +24,7 @@ public class TicketMapper {
                 ticket.getId(),
                 ticket.getCart(),
                 ticket.getStartAirport(),
-                ticket.getBetweenAirports(),
+                new AirportMapper().mapToAirportDtoList(ticket.getBetweenAirports()),
                 ticket.getEndAirport(),
                 ticket.getDateOfFlight()
         );
@@ -33,6 +33,12 @@ public class TicketMapper {
     public List<TicketDto> mapToTicketDtoList(final List<Ticket> ticketList){
         return ticketList.stream()
                 .map(this::mapToTicketDto)
+                .toList();
+    }
+
+    public List<Ticket> mapToTicketList(final List<TicketDto> ticketDtoList) {
+        return ticketDtoList.stream()
+                .map(this::mapToTicket)
                 .toList();
     }
 }

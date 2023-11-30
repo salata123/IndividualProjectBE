@@ -12,7 +12,7 @@ public class TicketDto {
     private Long id;
     private Cart cart;
     private Airport startAirport;
-    private List<Airport> betweenAirports;
+    private List<AirportDto> betweenAirports;
     private Airport endAirport;
     private LocalDate dateOfFlight;
 }
