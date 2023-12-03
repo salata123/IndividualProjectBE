@@ -37,5 +37,4 @@ public class AirportMapper {
                 .map(this::mapToAirport)
                 .toList();
     }
-
 }
