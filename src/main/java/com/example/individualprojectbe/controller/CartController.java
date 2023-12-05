@@ -2,6 +2,7 @@ package com.example.individualprojectbe.controller;
 
 import com.example.individualprojectbe.domain.Cart;
 import com.example.individualprojectbe.domain.CartDto;
+import com.example.individualprojectbe.exception.CartNotFoundException;
 import com.example.individualprojectbe.mapper.CartMapper;
 import com.example.individualprojectbe.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class CartController {
     }
 
     @GetMapping("{cartId}")
-    public ResponseEntity<CartDto> getCart(@PathVariable long cartId) throws CartNotFoundException{
+    public ResponseEntity<CartDto> getCart(@PathVariable long cartId) throws CartNotFoundException {
         return ResponseEntity.ok(cartMapper.mapToCartDto(cartService.getCart(cartId)));
     }
 

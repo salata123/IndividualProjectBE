@@ -2,6 +2,7 @@ package com.example.individualprojectbe.controller;
 
 import com.example.individualprojectbe.domain.Airport;
 import com.example.individualprojectbe.domain.AirportDto;
+import com.example.individualprojectbe.exception.AirportNotFoundException;
 import com.example.individualprojectbe.mapper.AirportMapper;
 import com.example.individualprojectbe.service.AirportService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class AirportController {
     }
 
     @GetMapping("{airportId}")
-    public ResponseEntity<AirportDto> getAirport(@PathVariable long airportId) throws AirportNotFoundException{
+    public ResponseEntity<AirportDto> getAirport(@PathVariable long airportId) throws AirportNotFoundException {
         return ResponseEntity.ok(airportMapper.mapToAirportDto(airportService.getAirport(airportId)));
     }
 
