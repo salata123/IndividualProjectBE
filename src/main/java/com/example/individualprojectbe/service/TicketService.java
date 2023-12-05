@@ -1,6 +1,6 @@
 package com.example.individualprojectbe.service;
 
-import com.example.individualprojectbe.controller.TicketNotFoundException;
+import com.example.individualprojectbe.exception.TicketNotFoundException;
 import com.example.individualprojectbe.domain.Ticket;
 import com.example.individualprojectbe.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.example.individualprojectbe.service;
 
-import com.example.individualprojectbe.controller.UserNotFoundException;
+import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.domain.User;
 import com.example.individualprojectbe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,6 +2,7 @@ package com.example.individualprojectbe.controller;
 
 import com.example.individualprojectbe.domain.User;
 import com.example.individualprojectbe.domain.UserDto;
+import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.mapper.UserMapper;
 import com.example.individualprojectbe.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("{userId}")
-    public ResponseEntity<UserDto> getUser(@PathVariable long userId) throws UserNotFoundException{
+    public ResponseEntity<UserDto> getUser(@PathVariable long userId) throws UserNotFoundException {
         return ResponseEntity.ok(userMapper.mapToUserDto(userService.getUser(userId)));
     }
 

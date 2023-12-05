@@ -1,6 +1,6 @@
 package com.example.individualprojectbe.service;
 
-import com.example.individualprojectbe.controller.AirportNotFoundException;
+import com.example.individualprojectbe.exception.AirportNotFoundException;
 import com.example.individualprojectbe.domain.Airport;
 import com.example.individualprojectbe.repository.AirportRepository;
 import org.springframework.beans.factory.annotation.Autowired;

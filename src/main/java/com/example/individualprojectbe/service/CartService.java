@@ -1,6 +1,6 @@
 package com.example.individualprojectbe.service;
 
-import com.example.individualprojectbe.controller.CartNotFoundException;
+import com.example.individualprojectbe.exception.CartNotFoundException;
 import com.example.individualprojectbe.domain.Cart;
 import com.example.individualprojectbe.repository.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;

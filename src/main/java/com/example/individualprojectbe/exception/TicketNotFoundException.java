@@ -1,4 +1,4 @@
-package com.example.individualprojectbe.controller;
+package com.example.individualprojectbe.exception;
 
 public class TicketNotFoundException extends Exception{
 }
