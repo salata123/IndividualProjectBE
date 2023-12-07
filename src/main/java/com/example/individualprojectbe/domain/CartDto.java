@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class CartDto {
     private Long id;
-    private List<TicketDto> ticketList = new ArrayList<>();
+    private List<TicketDto> ticketList;
 }

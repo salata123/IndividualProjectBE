@@ -19,5 +19,5 @@ public class Cart {
     private Long id;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-    private List<Ticket> ticketList = new ArrayList<>();
+    private List<Ticket> ticketList;
 }

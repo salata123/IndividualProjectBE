@@ -2,6 +2,7 @@ package com.example.individualprojectbe.amadeus.request;
 
 import com.example.individualprojectbe.amadeus.generators.AmadeusAccessKeyGenerator;
 import com.example.individualprojectbe.amadeus.mapper.JsonToFlightMapper;
+import com.example.individualprojectbe.amadeus.response.Flight;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -11,6 +12,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class AmadeusApiRequest {
@@ -21,8 +24,9 @@ public class AmadeusApiRequest {
         this.accessKeyGenerator = accessKeyGenerator;
     }
         //TO ADD: GENERATING JSONBODY WITH GIVEN PARAMETERS.
-    public void sendFlightOffersRequest() {
+    public List<Flight> sendFlightOffersRequest() {
         String accessToken = accessKeyGenerator.generateAccessToken();
+        List<Flight> flightList = new ArrayList<>();
 
         try {
             HttpClient httpClient = HttpClients.createDefault();
@@ -32,7 +36,7 @@ public class AmadeusApiRequest {
 
             httpPost.setHeader("Content-Type", "application/json");
 
-            String jsonBody = "{\"currencyCode\":\"EUR\",\"originDestinations\":[{\"id\":\"1\",\"originLocationCode\":\"NYC\",\"destinationLocationCode\":\"PAR\",\"departureDateTimeRange\":{\"date\":\"2023-12-07\",\"time\":\"10:00:00\"}}],\"travelers\":[{\"id\":\"1\",\"travelerType\":\"ADULT\"}],\"sources\":[\"GDS\"],\"searchCriteria\":{\"maxFlightOffers\":2,\"flightFilters\":{\"cabinRestrictions\":[{\"cabin\":\"BUSINESS\",\"coverage\":\"MOST_SEGMENTS\",\"originDestinationIds\":[\"1\"]}]}}}";
+            String jsonBody = "{\"currencyCode\":\"EUR\",\"originDestinations\":[{\"id\":\"1\",\"originLocationCode\":\"NYC\",\"destinationLocationCode\":\"PAR\",\"departureDateTimeRange\":{\"date\":\"2023-12-22\",\"time\":\"10:00:00\"}}],\"travelers\":[{\"id\":\"1\",\"travelerType\":\"ADULT\"}],\"sources\":[\"GDS\"],\"searchCriteria\":{\"maxFlightOffers\":2,\"flightFilters\":{\"cabinRestrictions\":[{\"cabin\":\"BUSINESS\",\"coverage\":\"MOST_SEGMENTS\",\"originDestinationIds\":[\"1\"]}]}}}";
             httpPost.setEntity(EntityBuilder.create().setText(jsonBody).build());
 
             HttpResponse response = httpClient.execute(httpPost);
@@ -40,10 +44,14 @@ public class AmadeusApiRequest {
             String jsonResponse = new String(response.getEntity().getContent().readAllBytes());
 
             System.out.println("Sending full Json response to create flight objects: " + jsonResponse); //DEBUG
+
+
+
             JsonToFlightMapper jsonToFlightMapper = new JsonToFlightMapper();
-            jsonToFlightMapper.mapResponseToObject(jsonResponse);
+            flightList = jsonToFlightMapper.mapResponseToObject(jsonResponse);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return flightList;
     }
 }
