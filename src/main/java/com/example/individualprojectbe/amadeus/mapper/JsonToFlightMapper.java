@@ -1,12 +1,15 @@
 package com.example.individualprojectbe.amadeus.mapper;
 
 import com.example.individualprojectbe.amadeus.response.Flight;
+import com.example.individualprojectbe.amadeus.response.Segment;
 import com.google.gson.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JsonToFlightMapper {
+    private List<Flight> flightList;
+
     public List<Flight> mapResponseToObject(String jsonResponse){
         JsonElement rootElement = JsonParser.parseString(jsonResponse);
         System.out.println("DEBUG ROOT ELEMENT:" + rootElement); //DEBUG
@@ -16,7 +19,7 @@ public class JsonToFlightMapper {
         System.out.println("DEBUG DATA ARRAY:" + dataArray); //DEBUG
 
         Gson gson = new Gson();
-        List<Flight> flightList = new ArrayList<>();
+        flightList = new ArrayList<>();
 
         for(JsonElement flightElement : dataArray){
             Flight flight = gson.fromJson(flightElement, Flight.class);
@@ -39,7 +42,7 @@ public class JsonToFlightMapper {
 
                 if (segmentsArray.size() > 0) {
                     for (JsonElement segmentElement : segmentsArray) {
-                        Flight.Segment segment = gson.fromJson(segmentElement, Flight.Segment.class);
+                        Segment segment = gson.fromJson(segmentElement, Segment.class);
                         System.out.println("Departure: " + segment.getDeparture()); //DEBUG
                         System.out.println("Arrival: " + segment.getArrival()); //DEBUG
 

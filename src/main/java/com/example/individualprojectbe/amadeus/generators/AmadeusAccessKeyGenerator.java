@@ -63,10 +63,8 @@ public class AmadeusAccessKeyGenerator {
                 result.append(line);
             }
 
-            // Parse the JSON response with Gson
             JsonObject jsonResponse = JsonParser.parseString(result.toString()).getAsJsonObject();
 
-            // Retrieve the access_token field
             this.accessToken = jsonResponse.get("access_token").getAsString();
         } catch (IOException e) {
             e.printStackTrace();
