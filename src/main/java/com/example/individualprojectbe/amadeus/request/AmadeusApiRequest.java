@@ -10,6 +10,7 @@ import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class AmadeusApiRequest {
         this.accessKeyGenerator = accessKeyGenerator;
     }
         //TO ADD: GENERATING JSONBODY WITH GIVEN PARAMETERS.
-    public List<Flight> sendFlightOffersRequest() {
+    public List<Flight> sendFlightOffersRequest(RequestData requestData) {
         String accessToken = accessKeyGenerator.generateAccessToken();
         List<Flight> flightList = new ArrayList<>();
 
@@ -36,8 +37,7 @@ public class AmadeusApiRequest {
 
             httpPost.setHeader("Content-Type", "application/json");
 
-            String jsonBody = "{\"currencyCode\":\"EUR\",\"originDestinations\":[{\"id\":\"1\",\"originLocationCode\":\"NYC\",\"destinationLocationCode\":\"PAR\",\"departureDateTimeRange\":{\"date\":\"2023-12-22\",\"time\":\"10:00:00\"}}],\"travelers\":[{\"id\":\"1\",\"travelerType\":\"ADULT\"}],\"sources\":[\"GDS\"],\"searchCriteria\":{\"maxFlightOffers\":2,\"flightFilters\":{\"cabinRestrictions\":[{\"cabin\":\"BUSINESS\",\"coverage\":\"MOST_SEGMENTS\",\"originDestinationIds\":[\"1\"]}]}}}";
-            httpPost.setEntity(EntityBuilder.create().setText(jsonBody).build());
+            String jsonBody = "{\"currencyCode\":\"" + requestData.getCurrencyCode() + "\",\"originDestinations\":[{\"id\":\"1\",\"originLocationCode\":\"" + requestData.getOriginLocationCode() + "\",\"destinationLocationCode\":\"" + requestData.getDestinationLocationCode() + "\",\"departureDateTimeRange\":{\"date\":\"" + requestData.getDepartureDate() + "\",\"time\":\"" + requestData.getDepartureTime() + "\"}}],\"travelers\":[{\"id\":\"1\",\"travelerType\":\"ADULT\"}],\"sources\":[\"GDS\"],\"searchCriteria\":{\"maxFlightOffers\":10,\"flightFilters\":{\"cabinRestrictions\":[{\"cabin\":\"BUSINESS\",\"coverage\":\"MOST_SEGMENTS\",\"originDestinationIds\":[\"1\"]}]}}}";            httpPost.setEntity(EntityBuilder.create().setText(jsonBody).build());
 
             HttpResponse response = httpClient.execute(httpPost);
 
