@@ -2,6 +2,7 @@ package com.example.individualprojectbe.controller;
 
 import com.example.individualprojectbe.amadeus.mapper.JsonToFlightMapper;
 import com.example.individualprojectbe.amadeus.request.AmadeusApiRequest;
+import com.example.individualprojectbe.amadeus.request.RequestData;
 import com.example.individualprojectbe.amadeus.response.Flight;
 import com.example.individualprojectbe.amadeus.response.FlightDto;
 import com.example.individualprojectbe.domain.Airport;
@@ -33,8 +34,8 @@ public class FlightController {
     private FlightService flightService;
 
     @PostMapping(value = "test")
-    public ResponseEntity<FlightDto> createFlight(){
-        for(Flight flight : amadeusApiRequest.sendFlightOffersRequest()) {
+    public ResponseEntity<FlightDto> createFlight(@RequestBody RequestData requestData){
+        for(Flight flight : amadeusApiRequest.sendFlightOffersRequest(requestData)) {
             flightService.saveFlight(flight);
         }
         return ResponseEntity.ok().build();
