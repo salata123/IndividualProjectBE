@@ -1,5 +1,6 @@
 package com.example.individualprojectbe.domain;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class UserDto {
     private Long id;
-    private String firstname;
-    private String lastname;
-    private LocalDate birthdayDate;
+    private String username;
+    private String password;
+    private Cart cart;
 }

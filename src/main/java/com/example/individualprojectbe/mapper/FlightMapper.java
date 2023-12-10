@@ -2,8 +2,6 @@ package com.example.individualprojectbe.mapper;
 
 import com.example.individualprojectbe.amadeus.response.Flight;
 import com.example.individualprojectbe.amadeus.response.FlightDto;
-import com.example.individualprojectbe.domain.Airport;
-import com.example.individualprojectbe.domain.AirportDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

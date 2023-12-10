@@ -1,9 +1,6 @@
 package com.example.individualprojectbe.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,12 +17,12 @@ public class User {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "FIRSTNAME")
-    private String firstname;
+    @Column(name = "USERNAME")
+    private String username;
 
-    @Column(name = "LASTNAME")
-    private String lastname;
+    @Column(name = "PASSWORD")
+    private String password;
 
-    @Column(name = "BIRTHDAY_DATE")
-    private LocalDate birthdayDate;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
 }

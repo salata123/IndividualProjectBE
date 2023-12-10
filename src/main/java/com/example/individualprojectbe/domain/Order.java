@@ -10,22 +10,22 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "CARTS")
-public class Cart {
+@Entity(name = "ORDERS")
+public class Order {
     @Id
     @GeneratedValue
     @Column(name = "ID")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "USER_ID")
-    private User user;
+    @ManyToOne
+    @JoinColumn(name = "CART_ID")
+    private Cart cart;
 
     @ElementCollection
     @CollectionTable(
-            name = "CART_FLIGHTS",
-            joinColumns = @JoinColumn(name = "CART_ID")
+            name = "ORDER_FLIGHTS",
+            joinColumns = @JoinColumn(name = "ORDER_ID")
     )
     @Column(name = "FLIGHT_ID")
-    private List<Long> flightList;
+    private List<Long> flights;
 }
