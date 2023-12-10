@@ -1,6 +1,5 @@
 package com.example.individualprojectbe.service;
 
-import com.example.individualprojectbe.amadeus.mapper.JsonToFlightMapper;
 import com.example.individualprojectbe.amadeus.response.Flight;
 import com.example.individualprojectbe.exception.FlightNotFoundException;
 import com.example.individualprojectbe.repository.FlightRepository;
