@@ -6,6 +6,7 @@ import com.example.individualprojectbe.exception.OrderNotFoundException;
 import com.example.individualprojectbe.mapper.OrderMapper;
 import com.example.individualprojectbe.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,9 @@ import java.util.List;
 @RequestMapping("/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
+    @Autowired
     private OrderService orderService;
+    @Autowired
     private OrderMapper orderMapper;
     @GetMapping
     public ResponseEntity<List<OrderDto>> getAllOrders(){

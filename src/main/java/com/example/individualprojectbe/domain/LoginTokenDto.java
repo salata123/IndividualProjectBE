@@ -1,18 +1,16 @@
 package com.example.individualprojectbe.domain;
 
-import com.example.individualprojectbe.amadeus.response.Flight;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDto {
+public class LoginTokenDto {
     private Long id;
-    private Cart cart;
     private User user;
-    private List<Long> flights;
+    private LocalDateTime expirationDate;
 }

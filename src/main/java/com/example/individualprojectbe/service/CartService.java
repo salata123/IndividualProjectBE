@@ -28,4 +28,15 @@ public class CartService {
     public void deleteCart(final Long id) {
         repository.deleteById(id);
     }
+    public Cart addFlightToCart(Long cartId, Long flightId) throws CartNotFoundException {
+        Cart cart = getCart(cartId);
+        cart.getFlightList().add(flightId);
+        return repository.save(cart);
+    }
+
+    public Cart removeFlightFromCart(Long cartId, Long flightId) throws CartNotFoundException {
+        Cart cart = getCart(cartId);
+        cart.getFlightList().remove(flightId);
+        return repository.save(cart);
+    }
 }
