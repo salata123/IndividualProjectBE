@@ -13,7 +13,9 @@ public class UserMapper {
                 userDto.getId(),
                 userDto.getUsername(),
                 userDto.getPassword(),
-                userDto.getCart()
+                userDto.getCart(),
+                userDto.getOrders(),
+                userDto.getLoginToken()
         );
     }
 
@@ -22,7 +24,9 @@ public class UserMapper {
                 user.getId(),
                 user.getUsername(),
                 user.getPassword(),
-                user.getCart()
+                user.getCart(),
+                user.getOrders(),
+                user.getLoginToken()
         );
     }
 

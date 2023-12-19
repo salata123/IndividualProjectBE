@@ -21,6 +21,10 @@ public class Order {
     @JoinColumn(name = "CART_ID")
     private Cart cart;
 
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
+
     @ElementCollection
     @CollectionTable(
             name = "ORDER_FLIGHTS",

@@ -15,6 +15,7 @@ public class OrderMapper {
         return new Order(
                 orderDto.getId(),
                 orderDto.getCart(),
+                orderDto.getUser(),
                 orderDto.getFlights()
         );
     }
@@ -23,6 +24,7 @@ public class OrderMapper {
         return new OrderDto(
                 order.getId(),
                 order.getCart(),
+                order.getUser(),
                 order.getFlights()
         );
     }

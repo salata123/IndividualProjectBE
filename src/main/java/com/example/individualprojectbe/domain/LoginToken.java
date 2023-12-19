@@ -6,13 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "CARTS")
-public class Cart {
+@Entity(name = "TOKENS")
+public class LoginToken {
     @Id
     @GeneratedValue
     @Column(name = "ID")
@@ -24,11 +24,6 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private User user;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "CART_FLIGHTS",
-            joinColumns = @JoinColumn(name = "CART_ID")
-    )
-    @Column(name = "FLIGHT_ID")
-    private List<Long> flightList;
+    @Column(name = "EXPIRATION_DATE")
+    private LocalDateTime expirationDate;
 }
