@@ -1,6 +1,5 @@
 package com.example.individualprojectbe.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,16 +17,14 @@ public class Cart {
     @Column(name = "ID")
     private Long id;
 
-    @JsonIgnore
-    @OneToOne
-    @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private User user;
+    @Column(name = "USER_ID")
+    private Long userId;
 
     @ElementCollection
     @CollectionTable(
             name = "CART_FLIGHTS",
-            joinColumns = @JoinColumn(name = "CART_ID")
+            joinColumns = @JoinColumn(name = "CART_ID"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"CART_ID", "FLIGHT_ID"})
     )
     @Column(name = "FLIGHT_ID")
     private List<Long> flightList;

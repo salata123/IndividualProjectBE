@@ -1,15 +1,14 @@
 package com.example.individualprojectbe.controller;
 
-import com.example.individualprojectbe.domain.Cart;
-import com.example.individualprojectbe.domain.LoginToken;
-import com.example.individualprojectbe.domain.User;
-import com.example.individualprojectbe.domain.UserDto;
+import com.example.individualprojectbe.domain.*;
+import com.example.individualprojectbe.exception.LoginTokenNotFoundException;
 import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.mapper.UserMapper;
 import com.example.individualprojectbe.service.CartService;
 import com.example.individualprojectbe.service.LoginTokenService;
 import com.example.individualprojectbe.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -62,8 +61,14 @@ public class UserController {
         return ResponseEntity.ok(userMapper.mapToUserDto(savedUser));
     }
 
+    @GetMapping("/{userUsername}/orders")
+    public ResponseEntity<List<Long>> getUserOrders(@PathVariable String userUsername) throws UserNotFoundException {
+        List<Long> orders = userService.getUserOrders(userUsername);
+        return ResponseEntity.ok(orders);
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Map<String, String> credentials) throws UserNotFoundException{
+    public ResponseEntity<String> login(@RequestBody Map<String, String> credentials) throws UserNotFoundException, LoginTokenNotFoundException {
         String username = credentials.get("username");
         String password = credentials.get("password");
         boolean isAuthenticated = userService.authenticateUser(username, password);
@@ -71,18 +76,30 @@ public class UserController {
         User user = userService.getUserByUsername(username);
 
         if (isAuthenticated) {
-            LoginToken loginToken = user.getLoginToken();
-
-            if (loginToken != null) {
-                // Update the expiration date of the existing token
+            if (user.getLoginTokenId() != null) {
+                Long loginTokenId = user.getLoginTokenId();
+                LoginToken loginToken = loginTokenService.getLoginToken(loginTokenId);
                 loginToken.setExpirationDate(LocalDateTime.now().plusMinutes(1));
                 loginTokenService.saveLoginToken(loginToken);
             } else {
-                // Create a new token if none exists
-                loginToken = new LoginToken();
-                loginToken.setUser(user);
+                LoginToken loginToken = new LoginToken();
+                loginToken.setUserId(user.getId());
                 loginToken.setExpirationDate(LocalDateTime.now().plusMinutes(1));
+                System.out.println(loginToken.getUserId());
+                System.out.println(loginToken.getId());
+                user.setLoginTokenId(null);
+                user.setLoginTokenId(loginToken.getId());
+                userService.saveUser(user);
                 loginTokenService.saveLoginToken(loginToken);
+            }
+            if(user.getCartId() != null){
+            } else {
+                Cart cart = new Cart();
+                cartService.saveCart(cart);
+                cart.setUserId(user.getId());
+                cartService.saveCart(cart);
+                user.setCartId(cart.getId());
+                userService.saveUser(user);
             }
 
             return ResponseEntity.ok("Login successful");
@@ -94,32 +111,23 @@ public class UserController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         try {
-            // Check if the username is already taken
             if (userService.isUsernameTaken(userDto.getUsername())) {
                 return ResponseEntity.status(400).body(null); // Return a 400 Bad Request status
             }
-
-            // Map UserDto to User entity
             User user = userMapper.mapToUser(userDto);
-
-            // Create a new Cart
+            LoginToken loginToken = new LoginToken();
             Cart cart = new Cart();
-            // Set flightList or perform additional operations on the cart if needed
+            cartService.saveCart(cart);
+            loginTokenService.saveLoginToken(loginToken);
 
-            // Set the user to the cart
-            cart.setUser(user);
-
-            // Set the cart to the user
-            user.setCart(cart);
-
-            // Save the user (which should cascade to the associated Cart)
+            cart.setUserId(user.getId());
+            user.setCartId(cart.getId());
+            user.setLoginTokenId(loginToken.getId());
+            loginToken.setUserId(user.getId());
             userService.saveUser(user);
-
-            // Return the created user DTO
             return ResponseEntity.ok(userMapper.mapToUserDto(user));
         } catch (Exception e) {
-            // Handle exceptions (e.g., database error)
-            return ResponseEntity.status(500).body(null); // Return a 500 Internal Server Error status
+            return ResponseEntity.status(500).body(null);
         }
     }
 

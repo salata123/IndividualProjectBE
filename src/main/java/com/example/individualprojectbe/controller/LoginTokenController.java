@@ -8,6 +8,7 @@ import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.mapper.LoginTokenMapper;
 import com.example.individualprojectbe.service.LoginTokenService;
 import com.example.individualprojectbe.service.UserService;
+import com.mysql.cj.log.Log;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -41,17 +42,30 @@ public class LoginTokenController {
     }
 
     @GetMapping("/checkExpiration/{username}")
-    public ResponseEntity<Boolean> checkTokenExpiration(@PathVariable String username) {
+    public ResponseEntity<Boolean> checkTokenExpiration(@PathVariable String username) throws LoginTokenNotFoundException {
         try {
             User user = userService.getUserByUsername(username);
-            LoginToken loginToken = user.getLoginToken();
+            System.out.println("TEST IF USER DOES HAVE A TOKEN" + username);
 
-            if (loginToken != null) {
+            if (user.getLoginTokenId() != null) {
+                LoginToken loginToken = loginTokenService.getLoginToken(user.getLoginTokenId());
                 boolean isExpired = loginTokenService.isTokenExpired(loginToken);
                 System.out.println("Time left:" + (Duration.between(LocalDateTime.now(), loginToken.getExpirationDate())));
                 return ResponseEntity.ok(isExpired);
             } else {
-                // Handle the case where the user or login token is null
+                System.out.println("DOES NOT HAVE TOKEN");
+
+                LoginToken loginToken = new LoginToken();
+                loginToken.setUserId(user.getId());
+                loginToken.setExpirationDate(LocalDateTime.now().plusMinutes(1));
+                loginTokenService.saveLoginToken(loginToken);
+
+                System.out.println(loginToken.getUserId());
+                System.out.println(loginToken.getId());
+
+                user.setLoginTokenId(loginToken.getId());
+                userService.saveUser(user);
+
                 return ResponseEntity.notFound().build();
             }
         } catch (UserNotFoundException e) {
@@ -59,6 +73,7 @@ public class LoginTokenController {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @DeleteMapping("{loginTokenId}")
     public ResponseEntity<Void> deleteLoginToken(@PathVariable long loginTokenId){
