@@ -2,43 +2,16 @@ package com.example.individualprojectbe.mapper;
 
 import com.example.individualprojectbe.domain.User;
 import com.example.individualprojectbe.domain.UserDto;
-import org.springframework.stereotype.Service;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 import java.util.List;
 
-@Service
-public class UserMapper {
-    public User mapToUser(final UserDto userDto) {
-        return new User(
-                userDto.getId(),
-                userDto.getUsername(),
-                userDto.getPassword(),
-                userDto.getCart(),
-                userDto.getOrders(),
-                userDto.getLoginToken()
-        );
-    }
-
-    public UserDto mapToUserDto(final User user) {
-        return new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getPassword(),
-                user.getCart(),
-                user.getOrders(),
-                user.getLoginToken()
-        );
-    }
-
-    public List<UserDto> mapToUserDtoList(final List<User> userList) {
-        return userList.stream()
-                .map(this::mapToUserDto)
-                .toList();
-    }
-
-    public List<User> mapToUserList(final List<UserDto> userDtoList) {
-        return userDtoList.stream()
-                .map(this::mapToUser)
-                .toList();
-    }
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    User mapToUser(UserDto userDto);
+    UserDto mapToUserDto(User user);
+    List<UserDto> mapToUserDtoList(List<User> userList);
+    List<User> mapToUserList(List<UserDto> userDtoList);
 }

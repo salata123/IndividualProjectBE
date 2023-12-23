@@ -11,6 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LoginTokenDto {
     private Long id;
-    private User user;
+    private Long userId;
     private LocalDateTime expirationDate;
 }

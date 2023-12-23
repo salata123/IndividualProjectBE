@@ -1,5 +1,6 @@
 package com.example.individualprojectbe.service;
 
+import com.example.individualprojectbe.domain.Order;
 import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.domain.User;
 import com.example.individualprojectbe.repository.UserRepository;
@@ -41,5 +42,17 @@ public class UserService {
 
     public boolean isUsernameTaken(String username) {
         return repository.existsByUsername(username);
+    }
+
+    public List<Long> getUserOrders(String username) throws UserNotFoundException {
+        User user = getUserByUsername(username);
+        return user.getOrders();
+    }
+
+    public void addOrderToUserOrders(Long userId, Long orderId) throws UserNotFoundException{
+        User user = getUser(userId);
+        List<Long> orders = getUserOrders(user.getUsername());
+        orders.add(orderId);
+        saveUser(user);
     }
 }

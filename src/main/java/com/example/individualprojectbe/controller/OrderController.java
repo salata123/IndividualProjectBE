@@ -3,8 +3,10 @@ package com.example.individualprojectbe.controller;
 import com.example.individualprojectbe.domain.Order;
 import com.example.individualprojectbe.domain.OrderDto;
 import com.example.individualprojectbe.exception.OrderNotFoundException;
+import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.mapper.OrderMapper;
 import com.example.individualprojectbe.service.OrderService;
+import com.example.individualprojectbe.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,6 +24,9 @@ public class OrderController {
     private OrderService orderService;
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private UserService userService;
+
     @GetMapping
     public ResponseEntity<List<OrderDto>> getAllOrders(){
         List<Order> orders = orderService.getAllOrders();
@@ -40,9 +45,10 @@ public class OrderController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto){
+    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) throws UserNotFoundException {
         Order order = orderMapper.mapToOrder(orderDto);
         orderService.saveOrder(order);
+        userService.addOrderToUserOrders(userService.getUser(order.getUserId()).getId(), order.getId());
         return ResponseEntity.ok().build();
     }
 
