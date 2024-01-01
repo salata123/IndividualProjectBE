@@ -12,14 +12,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 
 @SpringBootTest
 class CartControllerTest {
@@ -46,11 +44,14 @@ class CartControllerTest {
 
     @Test
     void getAllCartsTest() {
+        // Given
         when(cartService.getAllCarts()).thenReturn(List.of(cart));
         when(cartMapper.mapToCartDtoList(List.of(cart))).thenReturn(List.of(cartDto));
 
+        // When
         ResponseEntity<List<CartDto>> responseEntity = cartController.getAllCarts();
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());
@@ -63,11 +64,14 @@ class CartControllerTest {
 
     @Test
     void getCartTest() throws CartNotFoundException {
+        // Given
         when(cartService.getCart(1L)).thenReturn(cart);
         when(cartMapper.mapToCartDto(cart)).thenReturn(cartDto);
 
+        // When
         ResponseEntity<CartDto> responseEntity = cartController.getCart(1L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());
@@ -79,10 +83,13 @@ class CartControllerTest {
 
     @Test
     void getCartNotFoundTest() throws CartNotFoundException {
+        // Given
         when(cartService.getCart(1L)).thenThrow(new CartNotFoundException());
 
+        // When
         ResponseEntity<CartDto> responseEntity = cartController.getCart(1L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertNull(responseEntity.getBody());
@@ -92,8 +99,10 @@ class CartControllerTest {
 
     @Test
     void deleteCartTest() {
+        // When
         ResponseEntity<Void> responseEntity = cartController.deleteCart(1L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
@@ -102,10 +111,13 @@ class CartControllerTest {
 
     @Test
     void createCartTest() {
+        // Given
         when(cartMapper.mapToCart(cartDto)).thenReturn(cart);
 
+        // When
         ResponseEntity<CartDto> responseEntity = cartController.createCart(cartDto);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
@@ -114,11 +126,14 @@ class CartControllerTest {
 
     @Test
     void editCartTest() {
+        // Given
         when(cartMapper.mapToCart(cartDto)).thenReturn(cart);
         when(cartService.saveCart(cart)).thenReturn(cart);
 
+        // When
         ResponseEntity<CartDto> responseEntity = cartController.editCart(cartDto);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
@@ -132,11 +147,14 @@ class CartControllerTest {
 
     @Test
     void addFlightToCartTest() throws CartNotFoundException {
+        // Given
         when(cartService.addFlightToCart(1L, 2L)).thenReturn(cart);
         when(cartMapper.mapToCartDto(cart)).thenReturn(cartDto);
 
+        // When
         ResponseEntity<CartDto> responseEntity = cartController.addFlightToCart(1L, 2L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());
@@ -148,10 +166,13 @@ class CartControllerTest {
 
     @Test
     void addFlightToCartNotFoundTest() throws CartNotFoundException {
+        // Given
         when(cartService.addFlightToCart(1L, 2L)).thenThrow(new CartNotFoundException());
 
+        // When
         ResponseEntity<CartDto> responseEntity = cartController.addFlightToCart(1L, 2L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(404, responseEntity.getStatusCodeValue());
         assertNull(responseEntity.getBody());
@@ -162,11 +183,14 @@ class CartControllerTest {
 
     @Test
     void removeFlightFromCartTest() throws CartNotFoundException {
+        // Given
         when(cartService.removeFlightFromCart(1L, 2L)).thenReturn(cart);
         when(cartMapper.mapToCartDto(cart)).thenReturn(cartDto);
 
+        // When
         ResponseEntity<CartDto> responseEntity = cartController.removeFlightFromCart(1L, 2L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());
@@ -178,10 +202,13 @@ class CartControllerTest {
 
     @Test
     void removeFlightFromCartNotFoundTest() throws CartNotFoundException {
+        // Given
         when(cartService.removeFlightFromCart(1L, 2L)).thenThrow(new CartNotFoundException());
 
+        // When
         ResponseEntity<CartDto> responseEntity = cartController.removeFlightFromCart(1L, 2L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(404, responseEntity.getStatusCodeValue());
         assertNull(responseEntity.getBody());

@@ -14,8 +14,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import com.example.individualprojectbe.config.AdminConfig;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -75,12 +73,10 @@ public class AmadeusAccessKeyGenerator {
                 }
 
                 JsonObject jsonResponse = JsonParser.parseString(result.toString()).getAsJsonObject();
-
                 this.accessToken = jsonResponse.get("access_token").getAsString();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             System.out.println("Your access token: " + accessToken);
         }
         return accessToken;

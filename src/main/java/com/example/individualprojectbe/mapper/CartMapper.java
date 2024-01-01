@@ -3,8 +3,6 @@ package com.example.individualprojectbe.mapper;
 import com.example.individualprojectbe.domain.Cart;
 import com.example.individualprojectbe.domain.CartDto;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 import java.util.List;
 

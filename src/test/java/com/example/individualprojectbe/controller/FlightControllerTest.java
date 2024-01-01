@@ -62,20 +62,21 @@ class FlightControllerTest {
 
     @Test
     void createFlightTest() throws VisaNotFoundException {
+        // Given
         RequestData requestData = new RequestData();
 
-        // Mock the behavior of amadeusApiRequest and visaService
         when(amadeusApiRequest.sendFlightOffersRequest(requestData)).thenReturn(List.of(flight));
         when(visaService.checkVisaRequirements(departure, arrival, flight)).thenReturn(1L);
 
-        // Create a mock Visa object
         Visa mockVisa = new Visa();
         mockVisa.setVisaType("visa-free");
 
         when(visaService.getVisa(1L)).thenReturn(mockVisa);
 
+        // When
         ResponseEntity<FlightDto> responseEntity = flightController.createFlight(departure, arrival, requestData);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
@@ -87,12 +88,15 @@ class FlightControllerTest {
 
     @Test
     void getAllFlightsTest() {
+        // Given
         List<Flight> flights = List.of(flight);
         when(flightService.getAllFlights()).thenReturn(flights);
         when(flightMapper.mapToFlightDtoList(flights)).thenReturn(List.of(flightDto));
 
+        // When
         ResponseEntity<List<FlightDto>> responseEntity = flightController.getAllFlights();
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());
@@ -105,11 +109,14 @@ class FlightControllerTest {
 
     @Test
     void getFlightTest() throws FlightNotFoundException {
+        // Given
         when(flightService.getFlight(1L)).thenReturn(flight);
         when(flightMapper.mapToFlightDto(flight)).thenReturn(flightDto);
 
+        // When
         ResponseEntity<FlightDto> responseEntity = flightController.getFlight(1L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());
@@ -121,12 +128,15 @@ class FlightControllerTest {
 
     @Test
     void createFlightWithEmptyRequestTest() throws VisaNotFoundException {
+        // Given
         RequestData requestData = new RequestData();
 
         when(amadeusApiRequest.sendFlightOffersRequest(requestData)).thenReturn(new ArrayList<>());
 
+        // When
         ResponseEntity<FlightDto> responseEntity = flightController.createFlight(departure, arrival, requestData);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
@@ -136,12 +146,15 @@ class FlightControllerTest {
 
     @Test
     void getFlightExceptionTest() throws FlightNotFoundException {
+        // Given
         long nonExistentFlightId = 99999999L;
 
         when(flightService.getFlight(nonExistentFlightId)).thenThrow(new FlightNotFoundException());
 
+        // When
         ResponseEntity<FlightDto> responseEntity = flightController.getFlight(nonExistentFlightId);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(404, responseEntity.getStatusCodeValue());
         assertNull(responseEntity.getBody());

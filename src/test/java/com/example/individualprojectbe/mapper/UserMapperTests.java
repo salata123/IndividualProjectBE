@@ -22,7 +22,6 @@ class UserMapperTests {
     void setUp() {
         userMapper = Mappers.getMapper(UserMapper.class);
 
-        // Initialize objects for testing
         user = new User(1L, "john_doe", "password123", 101L, List.of(201L, 202L), 301L);
         userDto = new UserDto(1L, "john_doe", "password123", 101L, List.of(201L, 202L), 301L);
     }

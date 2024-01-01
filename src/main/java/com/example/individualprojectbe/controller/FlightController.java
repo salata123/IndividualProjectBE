@@ -1,4 +1,3 @@
-// FlightController.java
 package com.example.individualprojectbe.controller;
 
 import com.example.individualprojectbe.amadeus.request.AmadeusApiRequest;
