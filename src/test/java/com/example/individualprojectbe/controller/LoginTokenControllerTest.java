@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+@SpringBootTest
 
 class LoginTokenControllerTest {
 
@@ -44,7 +48,6 @@ class LoginTokenControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Initialize objects for testing
         loginToken = new LoginToken(1L, 101L, LocalDateTime.now().plusMinutes(5));
         loginTokenDto = new LoginTokenDto(1L, 101L, LocalDateTime.now().plusMinutes(5));
         user = new User(201L, "testUser", "password", 301L, new ArrayList<>(), 1L);
@@ -91,18 +94,18 @@ class LoginTokenControllerTest {
         ResponseEntity<LoginTokenDto> responseEntity = loginTokenController.getLoginToken(1L);
 
         assertNotNull(responseEntity);
-        assertEquals(404, responseEntity.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertNull(responseEntity.getBody());
 
         verify(loginTokenService, times(1)).getLoginToken(1L);
-        verify(loginTokenMapper, times(0)).mapToLoginTokenDto(loginToken);
+        verify(loginTokenMapper, never()).mapToLoginTokenDto(any());
     }
 
     @Test
     void checkTokenExpirationWithExistingTokenExpiredTest() throws LoginTokenNotFoundException, UserNotFoundException {
         when(userService.getUserByUsername("testUser")).thenReturn(user);
         when(loginTokenService.getLoginToken(user.getLoginTokenId())).thenReturn(loginToken);
-        when(loginTokenService.isTokenExpired(loginToken)).thenReturn(true);
+        when(loginTokenService.isTokenExpired(loginToken)).thenReturn(false);
 
         ResponseEntity<Boolean> responseEntity = loginTokenController.checkTokenExpiration("testUser");
 

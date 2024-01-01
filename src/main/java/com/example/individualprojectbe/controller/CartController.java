@@ -29,8 +29,12 @@ public class CartController {
     }
 
     @GetMapping("{cartId}")
-    public ResponseEntity<CartDto> getCart(@PathVariable long cartId) throws CartNotFoundException {
-        return ResponseEntity.ok(cartMapper.mapToCartDto(cartService.getCart(cartId)));
+    public ResponseEntity<CartDto> getCart(@PathVariable long cartId){
+        try {
+            return ResponseEntity.ok(cartMapper.mapToCartDto(cartService.getCart(cartId)));
+        } catch (CartNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("{cartId}")

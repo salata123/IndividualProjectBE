@@ -1,13 +1,9 @@
 package com.example.individualprojectbe.mapper;
 
 import com.example.individualprojectbe.amadeus.response.*;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
@@ -28,8 +24,8 @@ class FlightMapperTests {
         Segment segment1 = new Segment(1L, createLocation("JFK", "Terminal A", "10:00"), createLocation("LAX", "Terminal B", "14:00"));
         List<Segment> segments = new ArrayList<>();
         segments.add(segment1);
-        flight = new Flight(1L, price, 200, segments);
-        flightDto = new FlightDto(1L, price, 200, segments);
+        flight = new Flight(1L, price, 200, segments, 1L, "visa-free");
+        flightDto = new FlightDto(1L, price, 200, segments, 1L, "visa-free");
     }
 
     @Test

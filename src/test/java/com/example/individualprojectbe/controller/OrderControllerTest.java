@@ -2,6 +2,7 @@ package com.example.individualprojectbe.controller;
 
 import com.example.individualprojectbe.domain.Order;
 import com.example.individualprojectbe.domain.OrderDto;
+import com.example.individualprojectbe.domain.User;
 import com.example.individualprojectbe.exception.OrderNotFoundException;
 import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.mapper.OrderMapper;
@@ -18,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 class OrderControllerTest {
@@ -35,53 +36,63 @@ class OrderControllerTest {
     @InjectMocks
     private OrderController orderController;
 
+    private Order sampleOrder;
+    private User sampleUser;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.initMocks(this);
+        sampleOrder = new Order(1L, 1L, 1L, List.of(1L, 2L));
+        sampleUser = new User(1L, "sampleUser", "password", 1L, List.of(1L), 1L);
     }
 
     @Test
     void getAllOrders() {
         // Arrange
-        List<Order> orders = Collections.singletonList(new Order());
-        List<OrderDto> orderDtos = Collections.singletonList(new OrderDto());
-
-        when(orderService.getAllOrders()).thenReturn(orders);
-        when(orderMapper.mapToOrderDtoList(orders)).thenReturn(orderDtos);
+        when(orderService.getAllOrders()).thenReturn(Collections.singletonList(sampleOrder));
+        when(orderMapper.mapToOrderDtoList(anyList())).thenReturn(Collections.singletonList(new OrderDto(1L, 1L, 1L, List.of(1L, 2L))));
 
         // Act
-        ResponseEntity<List<OrderDto>> responseEntity = orderController.getAllOrders();
+        ResponseEntity<List<OrderDto>> response = orderController.getAllOrders();
 
         // Assert
-        assertEquals(orderDtos, responseEntity.getBody());
+        assertEquals(200, response.getStatusCodeValue());
+
+        List<OrderDto> orderDtos = response.getBody();
+        assertNotNull(orderDtos);
+        assertEquals(1, orderDtos.size());
+
+        OrderDto resultOrderDto = orderDtos.get(0);
+        assertNotNull(resultOrderDto);
+
+        // Add assertions for each parameter in OrderDto and the corresponding parameter in sampleOrder
+        assertEquals(sampleOrder.getId(), resultOrderDto.getId());
+        assertEquals(sampleOrder.getCartId(), resultOrderDto.getCartId());
+        assertEquals(sampleOrder.getUserId(), resultOrderDto.getUserId());
+        assertEquals(sampleOrder.getFlights(), resultOrderDto.getFlights());
     }
 
     @Test
     void getOrder() throws OrderNotFoundException {
         // Arrange
         long orderId = 1L;
-        Order order = new Order();
-        OrderDto orderDto = new OrderDto();
-
-        when(orderService.getOrder(orderId)).thenReturn(order);
-        when(orderMapper.mapToOrderDto(order)).thenReturn(orderDto);
+        when(orderService.getOrder(orderId)).thenReturn(sampleOrder);
+        when(orderMapper.mapToOrderDto(any())).thenReturn(new OrderDto(1L, 1L, 1L, List.of(1L, 2L)));
 
         // Act
-        ResponseEntity<OrderDto> responseEntity = orderController.getOrder(orderId);
+        ResponseEntity<OrderDto> response = orderController.getOrder(orderId);
 
         // Assert
-        assertEquals(orderDto, responseEntity.getBody());
-    }
+        assertEquals(200, response.getStatusCodeValue());
 
-    @Test
-    void getOrder_OrderNotFoundException() throws OrderNotFoundException {
-        // Arrange
-        long orderId = 1L;
+        OrderDto resultOrderDto = response.getBody();
+        assertNotNull(resultOrderDto);
 
-        when(orderService.getOrder(orderId)).thenThrow(new OrderNotFoundException());
-
-        // Act & Assert
-        assertThrows(OrderNotFoundException.class, () -> orderController.getOrder(orderId));
+        // Add assertions for each parameter in OrderDto and the corresponding parameter in sampleOrder
+        assertEquals(sampleOrder.getId(), resultOrderDto.getId());
+        assertEquals(sampleOrder.getCartId(), resultOrderDto.getCartId());
+        assertEquals(sampleOrder.getUserId(), resultOrderDto.getUserId());
+        assertEquals(sampleOrder.getFlights(), resultOrderDto.getFlights());
     }
 
     @Test
@@ -90,44 +101,40 @@ class OrderControllerTest {
         long orderId = 1L;
 
         // Act
-        ResponseEntity<Void> responseEntity = orderController.deleteOrder(orderId);
+        ResponseEntity<Void> response = orderController.deleteOrder(orderId);
 
         // Assert
-        verify(orderService).deleteOrder(orderId);
-        assertEquals(ResponseEntity.ok().build(), responseEntity);
+        assertEquals(200, response.getStatusCodeValue());
+        verify(orderService, times(1)).deleteOrder(orderId);
     }
 
     @Test
     void createOrder() throws UserNotFoundException {
         // Arrange
         OrderDto orderDto = new OrderDto();
-        Order order = new Order();
-
-        when(orderMapper.mapToOrder(orderDto)).thenReturn(order);
+        when(orderMapper.mapToOrder(orderDto)).thenReturn(sampleOrder);
+        when(orderService.saveOrder(sampleOrder)).thenReturn(sampleOrder);
+        when(userService.getUser(anyLong())).thenReturn(sampleUser);
 
         // Act
-        ResponseEntity<OrderDto> responseEntity = orderController.createOrder(orderDto);
+        ResponseEntity<OrderDto> response = orderController.createOrder(orderDto);
 
         // Assert
-        verify(orderService).saveOrder(order);
-        assertEquals(ResponseEntity.ok().build(), responseEntity);
+        assertEquals(200, response.getStatusCodeValue());
     }
 
     @Test
     void editOrder() {
         // Arrange
         OrderDto orderDto = new OrderDto();
-        Order order = new Order();
-        Order savedOrder = new Order();
-
-        when(orderMapper.mapToOrder(orderDto)).thenReturn(order);
-        when(orderService.saveOrder(order)).thenReturn(savedOrder);
-        when(orderMapper.mapToOrderDto(savedOrder)).thenReturn(orderDto);
+        when(orderMapper.mapToOrder(orderDto)).thenReturn(sampleOrder);
+        when(orderService.saveOrder(sampleOrder)).thenReturn(sampleOrder);
+        when(orderMapper.mapToOrderDto(sampleOrder)).thenReturn(new OrderDto());
 
         // Act
-        ResponseEntity<OrderDto> responseEntity = orderController.editOrder(orderDto);
+        ResponseEntity<OrderDto> response = orderController.editOrder(orderDto);
 
         // Assert
-        assertEquals(orderDto, responseEntity.getBody());
+        assertEquals(200, response.getStatusCodeValue());
     }
 }

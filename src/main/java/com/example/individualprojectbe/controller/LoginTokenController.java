@@ -11,6 +11,7 @@ import com.example.individualprojectbe.service.UserService;
 import com.mysql.cj.log.Log;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +38,12 @@ public class LoginTokenController {
     }
 
     @GetMapping("{loginTokenId}")
-    public ResponseEntity<LoginTokenDto> getLoginToken(@PathVariable long loginTokenId) throws LoginTokenNotFoundException {
-        return ResponseEntity.ok(loginTokenMapper.mapToLoginTokenDto(loginTokenService.getLoginToken(loginTokenId)));
+    public ResponseEntity<LoginTokenDto> getLoginToken(@PathVariable long loginTokenId) {
+        try {
+            return ResponseEntity.ok(loginTokenMapper.mapToLoginTokenDto(loginTokenService.getLoginToken(loginTokenId)));
+        } catch (LoginTokenNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/checkExpiration/{username}")

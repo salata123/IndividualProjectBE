@@ -26,7 +26,7 @@ public class LoginTokenService {
         return repository.findById(id).orElseThrow(LoginTokenNotFoundException::new);
     }
 
-    public static boolean isTokenExpired(LoginToken token) {
+    public boolean isTokenExpired(LoginToken token) {
         LocalDateTime now = LocalDateTime.now();
         return token.getExpirationDate().isBefore(now);
     }
