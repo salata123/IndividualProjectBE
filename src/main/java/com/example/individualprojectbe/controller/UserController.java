@@ -79,12 +79,12 @@ public class UserController {
             if (user.getLoginTokenId() != null) {
                 Long loginTokenId = user.getLoginTokenId();
                 LoginToken loginToken = loginTokenService.getLoginToken(loginTokenId);
-                loginToken.setExpirationDate(LocalDateTime.now().plusMinutes(1));
+                loginToken.setExpirationDate(LocalDateTime.now().plusSeconds(10));
                 loginTokenService.saveLoginToken(loginToken);
             } else {
                 LoginToken loginToken = new LoginToken();
                 loginToken.setUserId(user.getId());
-                loginToken.setExpirationDate(LocalDateTime.now().plusMinutes(1));
+                loginToken.setExpirationDate(LocalDateTime.now().plusSeconds(10));
                 System.out.println(loginToken.getUserId());
                 System.out.println(loginToken.getId());
                 user.setLoginTokenId(null);
@@ -112,7 +112,7 @@ public class UserController {
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         try {
             if (userService.isUsernameTaken(userDto.getUsername())) {
-                return ResponseEntity.status(400).body(null); // Return a 400 Bad Request status
+                return ResponseEntity.status(400).body(null);
             }
             User user = userMapper.mapToUser(userDto);
             LoginToken loginToken = new LoginToken();
@@ -125,7 +125,8 @@ public class UserController {
             user.setLoginTokenId(loginToken.getId());
             loginToken.setUserId(user.getId());
             userService.saveUser(user);
-            return ResponseEntity.ok(userMapper.mapToUserDto(user));
+            UserDto mappedUserDto = userMapper.mapToUserDto(user);
+            return ResponseEntity.ok(mappedUserDto);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }

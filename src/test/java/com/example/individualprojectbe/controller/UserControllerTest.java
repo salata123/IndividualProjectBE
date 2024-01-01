@@ -1,7 +1,8 @@
 package com.example.individualprojectbe.controller;
 
-import com.example.individualprojectbe.controller.UserController;
-import com.example.individualprojectbe.domain.*;
+import com.example.individualprojectbe.domain.LoginToken;
+import com.example.individualprojectbe.domain.User;
+import com.example.individualprojectbe.domain.UserDto;
 import com.example.individualprojectbe.exception.LoginTokenNotFoundException;
 import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.mapper.UserMapper;
@@ -13,17 +14,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
 class UserControllerTest {
 
     @Mock
@@ -41,17 +44,32 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
+    private List<User> users;
+    private List<UserDto> userDtos;
+    private User user;
+    private UserDto userDto;
+    private LoginToken loginToken;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        users = Collections.singletonList(
+                new User(1L, "testUser", "testPassword", 1L, Collections.singletonList(1L), 1L)
+        );
+
+        userDtos = Collections.singletonList(
+                new UserDto(1L, "testUser", "testPassword", 1L, Collections.singletonList(1L), 1L)
+        );
+
+        user = new User(1L, "testUser", "testPassword", 1L, Collections.singletonList(1L), 1L);
+        userDto = new UserDto(1L, "testUser", "testPassword", 1L, Collections.singletonList(1L), 1L);
+
+        loginToken = new LoginToken();
     }
 
     @Test
     void getAllUsers() {
         // Arrange
-        List<User> users = Collections.singletonList(new User());
-        List<UserDto> userDtos = Collections.singletonList(new UserDto());
-
         when(userService.getAllUsers()).thenReturn(users);
         when(userMapper.mapToUserDtoList(users)).thenReturn(userDtos);
 
@@ -65,15 +83,12 @@ class UserControllerTest {
     @Test
     void getUser() throws UserNotFoundException {
         // Arrange
-        long userId = 1L;
-        User user = new User();
-        UserDto userDto = new UserDto();
 
-        when(userService.getUser(userId)).thenReturn(user);
+        when(userService.getUser(1L)).thenReturn(user);
         when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
         // Act
-        ResponseEntity<UserDto> responseEntity = userController.getUser(userId);
+        ResponseEntity<UserDto> responseEntity = userController.getUser(1L);
 
         // Assert
         assertEquals(userDto, responseEntity.getBody());
@@ -83,8 +98,6 @@ class UserControllerTest {
     void getUserByUsername() throws UserNotFoundException {
         // Arrange
         String username = "testUser";
-        User user = new User();
-        UserDto userDto = new UserDto();
 
         when(userService.getUserByUsername(username)).thenReturn(user);
         when(userMapper.mapToUserDto(user)).thenReturn(userDto);
@@ -111,14 +124,14 @@ class UserControllerTest {
 
     @Test
     void editUser() {
-        // Arrange
-        UserDto userDto = new UserDto();
+        userDto.setUsername("newUser");
+
         User user = new User();
-        User savedUser = new User();
+        user.setUsername("newUser");
 
         when(userMapper.mapToUser(userDto)).thenReturn(user);
-        when(userService.saveUser(user)).thenReturn(savedUser);
-        when(userMapper.mapToUserDto(savedUser)).thenReturn(userDto);
+        when(userService.saveUser(user)).thenReturn(user);
+        when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
         // Act
         ResponseEntity<UserDto> responseEntity = userController.editUser(userDto);
@@ -147,13 +160,10 @@ class UserControllerTest {
         // Arrange
         Map<String, String> credentials = Map.of("username", "testUser", "password", "testPassword");
 
-        // Mock User and LoginToken creation
-        User user = new User();
-        user.setLoginTokenId(1L);
+        // Ensure that the user exists and has the correct password
         when(userService.getUserByUsername("testUser")).thenReturn(user);
-
-        LoginToken loginToken = new LoginToken();
         when(loginTokenService.getLoginToken(1L)).thenReturn(loginToken);
+        when(userService.authenticateUser(user.getUsername(), user.getPassword())).thenReturn(true);
 
         // Act
         ResponseEntity<String> responseEntity = userController.login(credentials);
@@ -165,19 +175,22 @@ class UserControllerTest {
     @Test
     void createUser() {
         // Arrange
-        UserDto userDto = new UserDto();
-        userDto.setUsername("newUser");
-
-        User user = new User();
-        user.setUsername("newUser");
-
         when(userMapper.mapToUser(userDto)).thenReturn(user);
-        when(userService.isUsernameTaken("newUser")).thenReturn(false);
+        when(userMapper.mapToUserDto(user)).thenReturn(userDto);
+        when(userService.isUsernameTaken(user.getUsername())).thenReturn(false);
 
         // Act
         ResponseEntity<UserDto> responseEntity = userController.createUser(userDto);
 
         // Assert
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // Check for null in the body
+        assertNotNull(responseEntity.getBody());
+
+        // If you have specific fields to check, you can add more assertions here
+        assertEquals(userDto.getId(), responseEntity.getBody().getId());
+        assertEquals(userDto.getUsername(), responseEntity.getBody().getUsername());
         assertEquals(userDto, responseEntity.getBody());
     }
 

@@ -1,5 +1,6 @@
 package com.example.individualprojectbe.amadeus.generators;
 
+import lombok.Getter;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -25,6 +26,7 @@ import java.util.Base64;
 import java.util.List;
 
 @Component
+@Getter
 public class AmadeusAccessKeyGenerator {
     private final AdminConfig adminConfig;
     private final String apiKey;
@@ -32,51 +34,55 @@ public class AmadeusAccessKeyGenerator {
     private final String tokenUrl = "https://test.api.amadeus.com/v1/security/oauth2/token";
     private String accessToken;
 
-    @Autowired
-    public AmadeusAccessKeyGenerator(AdminConfig adminConfig) {
+    private static AmadeusAccessKeyGenerator instance;
+
+    private AmadeusAccessKeyGenerator(AdminConfig adminConfig) {
         this.adminConfig = adminConfig;
         this.apiKey = adminConfig.getAmadeusApiKey();
         this.apiSecret = adminConfig.getAmadeusApiSecret();
     }
 
-    public String generateAccessToken() {
-        HttpClient httpClient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(tokenUrl);
+    public static AmadeusAccessKeyGenerator getInstance(AdminConfig adminConfig) {
+        if (instance == null) {
+            instance = new AmadeusAccessKeyGenerator(adminConfig);
+        }
+        return instance;
+    }
 
-        String authHeader = "Basic " + Base64.getEncoder().encodeToString((apiKey + ":" + apiSecret).getBytes());
-        httpPost.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+    public synchronized String generateAccessToken() {
+        if (accessToken == null) {
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpPost httpPost = new HttpPost(tokenUrl);
 
-        httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            String authHeader = "Basic " + Base64.getEncoder().encodeToString((apiKey + ":" + apiSecret).getBytes());
+            httpPost.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("grant_type", "client_credentials"));
+            httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(params));
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("grant_type", "client_credentials"));
 
-            HttpResponse response = httpClient.execute(httpPost);
+            try {
+                httpPost.setEntity(new UrlEncodedFormEntity(params));
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-            StringBuilder result = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
+                HttpResponse response = httpClient.execute(httpPost);
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                StringBuilder result = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                JsonObject jsonResponse = JsonParser.parseString(result.toString()).getAsJsonObject();
+
+                this.accessToken = jsonResponse.get("access_token").getAsString();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            JsonObject jsonResponse = JsonParser.parseString(result.toString()).getAsJsonObject();
-
-            this.accessToken = jsonResponse.get("access_token").getAsString();
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Your access token: " + accessToken);
         }
-
-        System.out.println("key  " + adminConfig.getAmadeusApiKey());
-        System.out.println("key  " + apiKey);
-
-        System.out.println("secret:  " + adminConfig.getAmadeusApiSecret());
-        System.out.println("secret:  " + apiSecret);
-
-        System.out.println("Your access token: " + accessToken);
         return accessToken;
     }
 }

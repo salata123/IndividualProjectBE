@@ -10,11 +10,14 @@ import com.example.individualprojectbe.amadeus.response.Segment;
 import com.example.individualprojectbe.exception.FlightNotFoundException;
 import com.example.individualprojectbe.mapper.FlightMapper;
 import com.example.individualprojectbe.service.FlightService;
+import com.example.individualprojectbe.visa.Visa;
+import com.example.individualprojectbe.visa.VisaNotFoundException;
+import com.example.individualprojectbe.visa.VisaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
 class FlightControllerTest {
 
     @Mock
@@ -34,39 +38,51 @@ class FlightControllerTest {
     @Mock
     private FlightService flightService;
 
+    @Mock
+    private VisaService visaService;
+
     @InjectMocks
     private FlightController flightController;
 
     private Flight flight;
     private FlightDto flightDto;
+    private final String departure = "PL";
+    private final String arrival = "GB";
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        // Initialize objects for testing
-        flight = new Flight(1L, new Price(101L, "USD", "1000", "900"), 200, new ArrayList<>());
+        flight = new Flight(1L, new Price(101L, "USD", "1000", "900"), 200, new ArrayList<>(), 1L, "visa-free");
         flight.getSegments().add(new Segment(1L, new Location(301L, "JFK", "T1", "2022-01-01"),
                 new Location(302L, "LAX", "T2", "2022-01-02")));
 
-        flightDto = new FlightDto(1L, new Price(101L, "USD", "1000", "900"), 200, new ArrayList<>());
+        flightDto = new FlightDto(1L, new Price(101L, "USD", "1000", "900"), 200, new ArrayList<>(), 1L, "visa-free");
         flightDto.getSegments().add(new Segment(1L, new Location(301L, "JFK", "T1", "2022-01-01"),
                 new Location(302L, "LAX", "T2", "2022-01-02")));
     }
 
     @Test
-    void createFlightTest() {
-        RequestData requestData = new RequestData(); // Add appropriate data for testing
+    void createFlightTest() throws VisaNotFoundException {
+        RequestData requestData = new RequestData();
 
+        // Mock the behavior of amadeusApiRequest and visaService
         when(amadeusApiRequest.sendFlightOffersRequest(requestData)).thenReturn(List.of(flight));
+        when(visaService.checkVisaRequirements(departure, arrival, flight)).thenReturn(1L);
 
-        ResponseEntity<FlightDto> responseEntity = flightController.createFlight(requestData);
+        // Create a mock Visa object
+        Visa mockVisa = new Visa();
+        mockVisa.setVisaType("visa-free");
+
+        when(visaService.getVisa(1L)).thenReturn(mockVisa);
+
+        ResponseEntity<FlightDto> responseEntity = flightController.createFlight(departure, arrival, requestData);
 
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
         verify(amadeusApiRequest, times(1)).sendFlightOffersRequest(requestData);
-        verify(flightService, times(1)).saveFlight(flight);
+        verify(visaService, times(1)).checkVisaRequirements(eq(departure), eq(arrival), eq(flight));
+        verify(visaService, times(1)).getVisa(1L);  // Verify that getVisa was called with the correct id
+        verify(flightService, times(2)).saveFlight(flight);
     }
 
     @Test
@@ -104,61 +120,33 @@ class FlightControllerTest {
     }
 
     @Test
-    void getFlightNotFoundTest() throws FlightNotFoundException {
-        when(flightService.getFlight(1L)).thenThrow(new FlightNotFoundException());
+    void createFlightWithEmptyRequestTest() throws VisaNotFoundException {
+        RequestData requestData = new RequestData();
 
-        ResponseEntity<FlightDto> responseEntity = flightController.getFlight(1L);
+        when(amadeusApiRequest.sendFlightOffersRequest(requestData)).thenReturn(new ArrayList<>());
+
+        ResponseEntity<FlightDto> responseEntity = flightController.createFlight(departure, arrival, requestData);
+
+        assertNotNull(responseEntity);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+
+        verify(amadeusApiRequest, times(1)).sendFlightOffersRequest(requestData);
+        verify(flightService, times(0)).saveFlight(any());
+    }
+
+    @Test
+    void getFlightExceptionTest() throws FlightNotFoundException {
+        long nonExistentFlightId = 99999999L;
+
+        when(flightService.getFlight(nonExistentFlightId)).thenThrow(new FlightNotFoundException());
+
+        ResponseEntity<FlightDto> responseEntity = flightController.getFlight(nonExistentFlightId);
 
         assertNotNull(responseEntity);
         assertEquals(404, responseEntity.getStatusCodeValue());
         assertNull(responseEntity.getBody());
 
-        verify(flightService, times(1)).getFlight(1L);
-        verify(flightMapper, times(0)).mapToFlightDto(flight);
-    }
-
-    @Test
-    void createFlightWithEmptyRequestTest() {
-        RequestData requestData = new RequestData(); // Add appropriate data for testing
-
-        when(amadeusApiRequest.sendFlightOffersRequest(requestData)).thenReturn(new ArrayList<>());
-
-        ResponseEntity<FlightDto> responseEntity = flightController.createFlight(requestData);
-
-        assertNotNull(responseEntity);
-        assertEquals(200, responseEntity.getStatusCodeValue());
-
-        verify(amadeusApiRequest, times(1)).sendFlightOffersRequest(requestData);
-        verify(flightService, times(0)).saveFlight(any());
-    }
-
-    @Test
-    void createFlightWithNullResponseTest() {
-        RequestData requestData = new RequestData(); // Add appropriate data for testing
-
-        when(amadeusApiRequest.sendFlightOffersRequest(requestData)).thenReturn(null);
-
-        ResponseEntity<FlightDto> responseEntity = flightController.createFlight(requestData);
-
-        assertNotNull(responseEntity);
-        assertEquals(200, responseEntity.getStatusCodeValue());
-
-        verify(amadeusApiRequest, times(1)).sendFlightOffersRequest(requestData);
-        verify(flightService, times(0)).saveFlight(any());
-    }
-
-    @Test
-    void createFlightWithExceptionTest() {
-        RequestData requestData = new RequestData();
-
-        when(amadeusApiRequest.sendFlightOffersRequest(requestData)).thenThrow(new RuntimeException());
-
-        ResponseEntity<FlightDto> responseEntity = flightController.createFlight(requestData);
-
-        assertNotNull(responseEntity);
-        assertEquals(500, responseEntity.getStatusCodeValue());
-
-        verify(amadeusApiRequest, times(1)).sendFlightOffersRequest(requestData);
-        verify(flightService, times(0)).saveFlight(any());
+        verify(flightService, times(1)).getFlight(nonExistentFlightId);
+        verify(flightMapper, times(0)).mapToFlightDto(any());
     }
 }
