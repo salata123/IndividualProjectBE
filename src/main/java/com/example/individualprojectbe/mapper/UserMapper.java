@@ -3,8 +3,6 @@ package com.example.individualprojectbe.mapper;
 import com.example.individualprojectbe.domain.User;
 import com.example.individualprojectbe.domain.UserDto;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 import java.util.List;
 

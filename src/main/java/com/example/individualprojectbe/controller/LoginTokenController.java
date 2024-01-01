@@ -8,7 +8,6 @@ import com.example.individualprojectbe.exception.UserNotFoundException;
 import com.example.individualprojectbe.mapper.LoginTokenMapper;
 import com.example.individualprojectbe.service.LoginTokenService;
 import com.example.individualprojectbe.service.UserService;
-import com.mysql.cj.log.Log;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -74,7 +73,6 @@ public class LoginTokenController {
                 return ResponseEntity.notFound().build();
             }
         } catch (UserNotFoundException e) {
-            // Handle the case where the user is not found
             return ResponseEntity.notFound().build();
         }
     }

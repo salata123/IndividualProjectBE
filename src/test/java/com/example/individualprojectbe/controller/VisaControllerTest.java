@@ -25,71 +25,70 @@ class VisaControllerTest {
     @InjectMocks
     private VisaController visaController;
 
-
     @Test
     void getVisa() throws VisaNotFoundException {
-        // Arrange
+        //Given
         long visaId = 1L;
         Visa mockVisa = new Visa();
         VisaDto mockVisaDto = new VisaDto();
         when(visaService.getVisa(visaId)).thenReturn(mockVisa);
         when(visaMapper.mapToVisaDto(mockVisa)).thenReturn(mockVisaDto);
 
-        // Act
+        //When
         ResponseEntity<VisaDto> responseEntity = visaController.getVisa(visaId);
 
-        // Assert
+        //Then
         assertEquals(mockVisaDto, responseEntity.getBody());
         verify(visaMapper, times(1)).mapToVisaDto(mockVisa);
     }
 
     @Test
     void deleteVisa() {
-        // Arrange
+        //Given
         long visaId = 1L;
 
-        // Act
+        //When
         ResponseEntity<Void> responseEntity = visaController.deleteVisa(visaId);
 
-        // Assert
+        //Then
         assertEquals(200, responseEntity.getStatusCodeValue());
         verify(visaService, times(1)).deleteVisa(visaId);
     }
 
     @Test
     void createVisa() {
-        // Arrange
+        //Given
         VisaDto mockVisaDto = new VisaDto();
         Visa mockVisa = new Visa();
         when(visaMapper.mapToVisa(mockVisaDto)).thenReturn(mockVisa);
 
-        // Act
+        //When
         ResponseEntity<VisaDto> responseEntity = visaController.createVisa(mockVisaDto);
 
-        // Assert
+        //Then
         assertEquals(200, responseEntity.getStatusCodeValue());
         verify(visaService, times(1)).saveVisa(mockVisa);
     }
 
     @Test
     void getAllVisas() {
-        // Arrange
+        //Given
         List<Visa> mockVisas = Arrays.asList(new Visa(1L, 1L, "visa-free"), new Visa(1L, 1L, "visa-free"));
         List<VisaDto> mockVisasDto = Arrays.asList(new VisaDto(1L, 1L, "visa-free"), new VisaDto(1L, 1L, "visa-free"));
         when(visaService.getAllVisas()).thenReturn(mockVisas);
         when(visaMapper.mapToVisaDtoList(visaService.getAllVisas())).thenReturn(mockVisasDto);
 
-        // Act
+        //When
         ResponseEntity<List<VisaDto>> responseEntity = visaController.getAllVisas();
 
-        // Assert
+        //Then
         assertEquals(mockVisas.size(), responseEntity.getBody().size());
         verify(visaMapper, times(1)).mapToVisaDtoList(mockVisas);
     }
 
     @Test
     void editVisa() throws VisaNotFoundException {
-        // Arrange
+        //Given
         long visaId = 1L;
         VisaDto mockVisaDto = new VisaDto();
         Visa existingVisa = new Visa();
@@ -98,10 +97,10 @@ class VisaControllerTest {
         when(visaMapper.mapToVisa(mockVisaDto)).thenReturn(updatedVisa);
         when(visaService.saveVisa(updatedVisa)).thenReturn(updatedVisa);
 
-        // Act
+        //When
         ResponseEntity<VisaDto> responseEntity = visaController.editVisa(mockVisaDto);
 
-        // Assert
+        //Then
         assertEquals(200, responseEntity.getStatusCodeValue());
         verify(visaService, times(1)).saveVisa(updatedVisa);
         verify(visaMapper, times(1)).mapToVisaDto(updatedVisa);

@@ -55,12 +55,15 @@ class LoginTokenControllerTest {
 
     @Test
     void getAllLoginTokensTest() {
+        // Given
         List<LoginToken> loginTokens = List.of(loginToken);
         when(loginTokenService.getAllLoginTokens()).thenReturn(loginTokens);
         when(loginTokenMapper.mapToLoginTokenDtoList(loginTokens)).thenReturn(List.of(loginTokenDto));
 
+        // When
         ResponseEntity<List<LoginTokenDto>> responseEntity = loginTokenController.getAllLoginTokens();
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());
@@ -73,11 +76,14 @@ class LoginTokenControllerTest {
 
     @Test
     void getLoginTokenTest() throws LoginTokenNotFoundException {
+        // Given
         when(loginTokenService.getLoginToken(1L)).thenReturn(loginToken);
         when(loginTokenMapper.mapToLoginTokenDto(loginToken)).thenReturn(loginTokenDto);
 
+        // When
         ResponseEntity<LoginTokenDto> responseEntity = loginTokenController.getLoginToken(1L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());
@@ -89,10 +95,13 @@ class LoginTokenControllerTest {
 
     @Test
     void getLoginTokenNotFoundTest() throws LoginTokenNotFoundException {
+        // Given
         when(loginTokenService.getLoginToken(1L)).thenThrow(new LoginTokenNotFoundException());
 
+        // When
         ResponseEntity<LoginTokenDto> responseEntity = loginTokenController.getLoginToken(1L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertNull(responseEntity.getBody());
@@ -103,12 +112,15 @@ class LoginTokenControllerTest {
 
     @Test
     void checkTokenExpirationWithExistingTokenExpiredTest() throws LoginTokenNotFoundException, UserNotFoundException {
+        // Given
         when(userService.getUserByUsername("testUser")).thenReturn(user);
         when(loginTokenService.getLoginToken(user.getLoginTokenId())).thenReturn(loginToken);
         when(loginTokenService.isTokenExpired(loginToken)).thenReturn(false);
 
+        // When
         ResponseEntity<Boolean> responseEntity = loginTokenController.checkTokenExpiration("testUser");
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertFalse(responseEntity.getBody());
@@ -120,12 +132,15 @@ class LoginTokenControllerTest {
 
     @Test
     void checkTokenExpirationWithoutExistingTokenTest() throws UserNotFoundException, LoginTokenNotFoundException {
+        // Given
         when(userService.getUserByUsername("testUser")).thenReturn(user);
         user.setLoginTokenId(null);
         when(loginTokenService.saveLoginToken(any())).thenReturn(new LoginToken(2L, 201L, LocalDateTime.now().plusMinutes(1)));
 
+        // When
         ResponseEntity<Boolean> responseEntity = loginTokenController.checkTokenExpiration("testUser");
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(404, responseEntity.getStatusCodeValue());
 
@@ -135,8 +150,10 @@ class LoginTokenControllerTest {
 
     @Test
     void deleteLoginTokenTest() {
+        // When
         ResponseEntity<Void> responseEntity = loginTokenController.deleteLoginToken(1L);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
@@ -145,13 +162,16 @@ class LoginTokenControllerTest {
 
     @Test
     void createLoginTokenTest() {
+        // Given
         LoginTokenDto inputDto = new LoginTokenDto(null, 101L, LocalDateTime.now().plusMinutes(5));
         LoginToken inputToken = new LoginToken(null, 101L, LocalDateTime.now().plusMinutes(5));
 
         when(loginTokenMapper.mapToLoginToken(inputDto)).thenReturn(inputToken);
 
+        // When
         ResponseEntity<LoginTokenDto> responseEntity = loginTokenController.createLoginToken(inputDto);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
@@ -161,6 +181,7 @@ class LoginTokenControllerTest {
 
     @Test
     void editLoginTokenTest() {
+        // Given
         LoginTokenDto inputDto = new LoginTokenDto(1L, 101L, LocalDateTime.now().plusMinutes(5));
         LoginToken inputToken = new LoginToken(1L, 101L, LocalDateTime.now().plusMinutes(5));
 
@@ -168,8 +189,10 @@ class LoginTokenControllerTest {
         when(loginTokenService.saveLoginToken(inputToken)).thenReturn(inputToken);
         when(loginTokenMapper.mapToLoginTokenDto(inputToken)).thenReturn(inputDto);
 
+        // When
         ResponseEntity<LoginTokenDto> responseEntity = loginTokenController.editLoginToken(inputDto);
 
+        // Then
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(responseEntity.getBody());

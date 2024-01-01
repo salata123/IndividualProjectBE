@@ -5,7 +5,7 @@ import com.example.individualprojectbe.amadeus.response.Price;
 import com.example.individualprojectbe.amadeus.response.Segment;
 
 public class FlightBuilderImpl implements FlightBuilder {
-    private Flight flight = new Flight();
+    private final Flight flight = new Flight();
 
     @Override
     public FlightBuilder setPrice(Price price) {

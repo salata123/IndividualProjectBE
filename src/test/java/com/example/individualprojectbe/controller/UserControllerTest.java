@@ -67,63 +67,64 @@ class UserControllerTest {
         loginToken = new LoginToken();
     }
 
+
     @Test
-    void getAllUsers() {
-        // Arrange
+    void shouldReturnAllUsersWhenRequested() {
+        // Given
         when(userService.getAllUsers()).thenReturn(users);
         when(userMapper.mapToUserDtoList(users)).thenReturn(userDtos);
 
-        // Act
+        // When
         ResponseEntity<List<UserDto>> responseEntity = userController.getAllUsers();
 
-        // Assert
+        // Then
         assertEquals(userDtos, responseEntity.getBody());
     }
 
     @Test
-    void getUser() throws UserNotFoundException {
-        // Arrange
-
+    void shouldReturnUserDetailsById() throws UserNotFoundException {
+        // Given
         when(userService.getUser(1L)).thenReturn(user);
         when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-        // Act
+        // When
         ResponseEntity<UserDto> responseEntity = userController.getUser(1L);
 
-        // Assert
+        // Then
         assertEquals(userDto, responseEntity.getBody());
     }
 
     @Test
-    void getUserByUsername() throws UserNotFoundException {
-        // Arrange
+    void shouldReturnUserDetailsByUsername() throws UserNotFoundException {
+        // Given
         String username = "testUser";
 
         when(userService.getUserByUsername(username)).thenReturn(user);
         when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-        // Act
+        // When
         ResponseEntity<UserDto> responseEntity = userController.getUserByUsername(username);
 
-        // Assert
+        // Then
         assertEquals(userDto, responseEntity.getBody());
     }
 
     @Test
-    void deleteUser() {
-        // Arrange
+    void shouldDeleteUserById() {
+        // Given
         long userId = 1L;
 
-        // Act
+        // When
         ResponseEntity<Void> responseEntity = userController.deleteUser(userId);
 
-        // Assert
+        // Then
         verify(userService, times(1)).deleteUser(userId);
         assertEquals(ResponseEntity.ok().build(), responseEntity);
     }
 
     @Test
-    void editUser() {
+    void shouldEditUserDetails() {
+        // Given
         userDto.setUsername("newUser");
 
         User user = new User();
@@ -133,78 +134,75 @@ class UserControllerTest {
         when(userService.saveUser(user)).thenReturn(user);
         when(userMapper.mapToUserDto(user)).thenReturn(userDto);
 
-        // Act
+        // When
         ResponseEntity<UserDto> responseEntity = userController.editUser(userDto);
 
-        // Assert
+        // Then
         assertEquals(userDto, responseEntity.getBody());
     }
 
     @Test
-    void getUserOrders() throws UserNotFoundException {
-        // Arrange
+    void shouldReturnUserOrdersByUsername() throws UserNotFoundException {
+        // Given
         String userUsername = "testUser";
         List<Long> orders = Collections.singletonList(1L);
 
         when(userService.getUserOrders(userUsername)).thenReturn(orders);
 
-        // Act
+        // When
         ResponseEntity<List<Long>> responseEntity = userController.getUserOrders(userUsername);
 
-        // Assert
+        // Then
         assertEquals(orders, responseEntity.getBody());
     }
 
     @Test
-    void login() throws UserNotFoundException, LoginTokenNotFoundException {
-        // Arrange
+    void shouldSuccessfullyLoginWithValidCredentials() throws UserNotFoundException, LoginTokenNotFoundException {
+        // Given
         Map<String, String> credentials = Map.of("username", "testUser", "password", "testPassword");
 
-        // Ensure that the user exists and has the correct password
         when(userService.getUserByUsername("testUser")).thenReturn(user);
         when(loginTokenService.getLoginToken(1L)).thenReturn(loginToken);
         when(userService.authenticateUser(user.getUsername(), user.getPassword())).thenReturn(true);
 
-        // Act
+        // When
         ResponseEntity<String> responseEntity = userController.login(credentials);
 
-        // Assert
+        // Then
         assertEquals("Login successful", responseEntity.getBody());
     }
 
     @Test
-    void createUser() {
-        // Arrange
+    void shouldCreateNewUser() {
+        // Given
         when(userMapper.mapToUser(userDto)).thenReturn(user);
         when(userMapper.mapToUserDto(user)).thenReturn(userDto);
         when(userService.isUsernameTaken(user.getUsername())).thenReturn(false);
 
-        // Act
+        // When
         ResponseEntity<UserDto> responseEntity = userController.createUser(userDto);
 
-        // Assert
+        // Then
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-        // Check for null in the body
         assertNotNull(responseEntity.getBody());
 
-        // If you have specific fields to check, you can add more assertions here
         assertEquals(userDto.getId(), responseEntity.getBody().getId());
         assertEquals(userDto.getUsername(), responseEntity.getBody().getUsername());
         assertEquals(userDto, responseEntity.getBody());
     }
 
     @Test
-    void isUsernameTaken() {
-        // Arrange
+    void shouldCheckIfUsernameIsTaken() {
+        // Given
         String username = "testUser";
 
         when(userService.isUsernameTaken(username)).thenReturn(true);
 
-        // Act
+        // When
         ResponseEntity<Boolean> responseEntity = userController.isUsernameTaken(username);
 
-        // Assert
+        // Then
         assertEquals(true, responseEntity.getBody());
     }
 }
