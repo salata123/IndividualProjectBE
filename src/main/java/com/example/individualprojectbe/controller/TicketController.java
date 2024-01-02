@@ -2,7 +2,6 @@ package com.example.individualprojectbe.controller;
 
 import com.example.individualprojectbe.domain.Ticket;
 import com.example.individualprojectbe.domain.TicketDto;
-import com.example.individualprojectbe.exception.TicketNotFoundException;
 import com.example.individualprojectbe.mapper.TicketMapper;
 import com.example.individualprojectbe.service.TicketService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class TicketController {
     }
 
     @GetMapping(value = "{ticketId}")
-    public ResponseEntity<TicketDto> getTicket(@PathVariable Long ticketId) throws TicketNotFoundException {
+    public ResponseEntity<TicketDto> getTicket(@PathVariable Long ticketId) throws TicketNotFoundException{
         return ResponseEntity.ok(ticketMapper.mapToTicketDto(ticketService.getTicket(ticketId)));
     }
 
