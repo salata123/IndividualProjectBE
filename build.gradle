@@ -21,6 +21,15 @@ repositories {
     mavenCentral()
 }
 
+bootRun {
+    environment("DATABASE_URL", project.findProperty("DATABASE_URL") ?: "")
+    environment("DATABASE_USERNAME", project.findProperty("DATABASE_USERNAME") ?: "")
+    environment("DATABASE_PASSWORD", project.findProperty("DATABASE_PASSWORD") ?: "")
+
+    environment("AMADEUS_API_KEY", project.findProperty("AMADEUS_API_KEY") ?: "")
+    environment("AMADEUS_API_SECRET", project.findProperty("AMADEUS_API_SECRET") ?: "")
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
