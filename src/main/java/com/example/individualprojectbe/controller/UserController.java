@@ -78,12 +78,12 @@ public class UserController {
             if (user.getLoginTokenId() != null) {
                 Long loginTokenId = user.getLoginTokenId();
                 LoginToken loginToken = loginTokenService.getLoginToken(loginTokenId);
-                loginToken.setExpirationDate(LocalDateTime.now().plusSeconds(10));
+                loginToken.setExpirationDate(LocalDateTime.now().plusMinutes(1));
                 loginTokenService.saveLoginToken(loginToken);
             } else {
                 LoginToken loginToken = new LoginToken();
                 loginToken.setUserId(user.getId());
-                loginToken.setExpirationDate(LocalDateTime.now().plusSeconds(10));
+                loginToken.setExpirationDate(LocalDateTime.now().plusMinutes(1));
                 System.out.println(loginToken.getUserId());
                 System.out.println(loginToken.getId());
                 user.setLoginTokenId(null);
