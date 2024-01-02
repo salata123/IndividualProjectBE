@@ -11,6 +11,8 @@ To be able to use Amadeus API, You need to:
 3. Click button "Create new app", fill the fields and click "Create" button
 4. Open the created app tab, go to App Keys section, copy API Key and API Secret and add them into application.properties file inside my project
 5. If You are already in the application.properties file You can also add datasource url, username and password to connect to the database (the same for Frontend application database parameters).
+
+Note: for this project I am using SDK: Eclipse Temurin version 17.0.6
 ## Visual layer
 Run this app to be able to use the visual layer crafted for backend: https://github.com/salata123/IndividualProjectFE
 
