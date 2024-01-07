@@ -36,11 +36,13 @@ Disclaimer:
 - A Login Token has a timer to expire in 1 minute from logging in. The method that checks the login expiration doesn't work well when changing the views, probably linked to Vaadin session handling or some new Beans creating along the way.
 ## Lessons Learned
 
-Some of the most valuable lessons that I've learned throught this project among neverending debugging and trying to connect everything together:
+Some of the most valuable lessons that I've learned throught this project among neverending challenges, debugging and trying to connect everything together:
 - @Mapper - an annotation that helps to create mappers automatically.
 - Singleton pattern - helps optimize application work thanks to instancing. In this example, instead of requesting a new authentication token every time I need to create Flight objects, I could create a new instance for the token and use its instance whenever I would need to.
+- How to read API documentation and use it to map requests and responses
 - A lot of session-related concepts in Vaadin, tree dependencies, beans, etc.
 - Also that CSS formatting doesn't work very well with Vaadin
+
 
 ## Plans for the future
 - Learn security to operate between sessions, creating passwords and user data, store it, and secure it. (Prioritize Spring Security)
